@@ -1,9 +1,9 @@
-require('dotenv').config();
+require('dotenv').config(); //import dotenv
 
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');;
-const users = require('./src/configs/data').userDB;
+const express = require('express'); //untuk import express
+const jwt = require('jsonwebtoken'); //untuk import jsonwebtoken
+const bcrypt = require('bcrypt'); //untuk import bcrypt
+const users = require('./src/configs/data').userDB; //untuk import userDB dari data
 
 
 const app = express();
@@ -12,7 +12,7 @@ var refreshTokensDB = []; // to store the refresh tokens when they are generated
 
 app.use(express.json());
 
-app.get('/', function(req, res) {
+app.get('/', function(req, res) { //http get untuk mengget data
     res.json({
         type: 'get',
         number: 1,
@@ -22,7 +22,7 @@ app.get('/', function(req, res) {
 })
 
 // This endpoint will register new user
-app.post('/register', async(req, res) => {
+app.post('/register', async(req, res) => { //http post untuk register beserta pengecekan apakah ada user yang sama
 
     try {
         let foundUser = users.find((data) => req.body.email === data.email);
@@ -53,6 +53,7 @@ app.post('/register', async(req, res) => {
 // '/login' route will authenticate the user
 // and only after successful authentication,
 // it will send access and refresh tokens
+// http post untuk login dan pencocokan data dengan yang sudah di register. jika berhasil login akan mendapat access token
 app.post('/login', async(req, res) => {
 
     try {
@@ -93,13 +94,13 @@ app.post('/login', async(req, res) => {
     }
 });
 
-
+//untuk generate access token
 // Following function will generate access token that will be valid for 2 minutes
 function generateAccessToken(payload) {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2m' });
 }
 
-
+//untuk refresh dan generate token baru
 // '/token' endpoint will accept the refresh token to generate new access token
 app.post('/token', (req, res) => {
 
@@ -134,6 +135,7 @@ app.post('/token', (req, res) => {
 // '/delRefreshToken' endpoint will be used by the legitimate client 
 // to delete the refresh token when his/her access token is compromised/stolen.
 // This endpoint will accept the Refresh token and delete it from the database.
+//untuk menghapus access token yang ada
 app.delete('/delRefreshToken', (req, res) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -150,6 +152,7 @@ app.delete('/delRefreshToken', (req, res) => {
 
 });
 
+//digunakan untuk menset berjalan di port berapa
 app.set('port', (process.env.PORT || 8080));
 app.listen(app.get('port'), function() {
     console.log("Authentication server is listening on port: ", app.get('port'));
